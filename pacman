@@ -1,0 +1,50 @@
+import pygame
+from config import TILE_SIZE, PACMAN_SPEED, YELLOW
+from game_map import MAP
+
+class Pacman:
+    score = 0
+    def __init__(self):
+        self.x, self.y = TILE_SIZE, TILE_SIZE
+        self.dx, self.dy = PACMAN_SPEED, 0
+        self.next_dx, self.next_dy = self.dx, self.dy
+        self.radius = TILE_SIZE // 2
+
+    @classmethod
+    def get_score(cls):
+        return cls.score
+
+    @classmethod
+    def set_score(cls, value):
+        cls.score = value
+
+    def handle_keys(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.next_dx, self.next_dy = -PACMAN_SPEED, 0
+        elif keys[pygame.K_RIGHT]:
+            self.next_dx, self.next_dy = PACMAN_SPEED, 0
+        elif keys[pygame.K_UP]:
+            self.next_dx, self.next_dy = 0, -PACMAN_SPEED
+        elif keys[pygame.K_DOWN]:
+            self.next_dx, self.next_dy = 0, PACMAN_SPEED
+
+    def can_move(self, new_x, new_y):
+        col1, row1 = new_x // TILE_SIZE, new_y // TILE_SIZE
+        col2, row2 = (new_x + TILE_SIZE - 1) // TILE_SIZE, (new_y + TILE_SIZE - 1) // TILE_SIZE
+        return all(MAP[r][c] not in (1, 2) for r in (row1, row2) for c in (col1, col2))
+
+    def move(self):
+        if self.can_move(self.x + self.next_dx, self.y + self.next_dy):
+            self.dx, self.dy = self.next_dx, self.next_dy
+        if self.can_move(self.x + self.dx, self.y + self.dy):
+            self.x += self.dx
+            self.y += self.dy
+
+        col, row = self.x // TILE_SIZE, self.y // TILE_SIZE
+        if MAP[row][col] == 0:
+            MAP[row][col] = -1
+            Pacman.score += 1
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, YELLOW, (self.x + 10, self.y + 10), self.radius)
