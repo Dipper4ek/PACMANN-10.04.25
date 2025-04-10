@@ -1,0 +1,47 @@
+import pygame
+from config import *
+from game_map import MAP
+from pacman import Pacman
+from enemy import Enemy
+from utils import draw_map, draw_score
+
+WIDTH, HEIGHT = len(MAP[0]) * TILE_SIZE, len(MAP) * TILE_SIZE + 40
+
+def start_game():
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 30)
+
+    pacman = Pacman()
+    enemies = [
+        Enemy(10 * TILE_SIZE, 10 * TILE_SIZE, speed=0.1),
+        Enemy(15 * TILE_SIZE, 5 * TILE_SIZE, color=(0, 255, 0), speed=0.1)
+    ]
+
+    while True:
+        screen.fill(BLACK)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return
+
+        draw_map(screen)
+        pacman.handle_keys()
+        pacman.move()
+        pacman.draw(screen)
+
+        for enemy in enemies:
+            enemy.move_towards_pacman(pacman)
+            enemy.draw(screen)
+            if abs(enemy.x - pacman.x) < TILE_SIZE // 2 and abs(enemy.y - pacman.y) < TILE_SIZE // 2:
+                return start_game()
+                Pacman.score -= 10
+
+        draw_score(screen, font, Pacman.get_score(), HEIGHT)
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+start_game()
