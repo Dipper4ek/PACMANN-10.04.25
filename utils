@@ -1,0 +1,19 @@
+import pygame
+from config import TILE_SIZE, BLUE, PURPLE, WHITE
+from game_map import MAP
+
+def draw_map(screen):
+    for row_idx, row in enumerate(MAP):
+        for col_idx, tile in enumerate(row):
+            x = col_idx * TILE_SIZE
+            y = row_idx * TILE_SIZE
+            if tile == 1:
+                pygame.draw.rect(screen, BLUE, (x, y, TILE_SIZE, TILE_SIZE))
+            elif tile == 2:
+                pygame.draw.rect(screen, PURPLE, (x, y, TILE_SIZE, TILE_SIZE))
+            elif tile == 0:
+                pygame.draw.circle(screen, WHITE, (x + TILE_SIZE // 2, y + TILE_SIZE // 2), 3)
+
+def draw_score(screen, font, score, height):
+    text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(text, (10, height - 30))
